@@ -15,7 +15,7 @@ A transparent animated WebP exported at 2× scale. This is the short idle sample
 - **Windows PowerShell 5.1** and **.NET Framework 4.x**. The scripts use the Framework compiler; a .NET SDK is not required.
 - **[Universal Character Scripting Helper (UCSH)](https://tmafe.com/ucsh)** for `FrontierUtopia.dll`.
 - **[FFmpeg](https://ffmpeg.org/download.html)** available on your `PATH`, with H.264, AAC, and animated WebP encoding support. Validation also uses `ffprobe`.
-- Your own **`.ACT` character files**. Microsoft Agent `.ACS` files are not supported.
+- **`.ACT` character files**, also available from [TMAFE's classic Microsoft Actors collection](https://tmafe.com/classic-ms-actors). Microsoft Agent `.ACS` files are not supported.
 
 UCSH, FFmpeg, and character files are not bundled.
 
