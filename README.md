@@ -21,24 +21,13 @@ UCSH, FFmpeg, and character files are not bundled.
 
 ## Quick start
 
-1. Clone or download this repository and extract it to a folder you can write to. Keep all `.cs` and `.ps1` files together.
-2. [Download and install UCSH](https://tmafe.com/ucsh_latest.html). Copy `FrontierUtopia.dll` from its installation folder (typically `C:\Program Files (x86)\UCSH`) into the exporter folder.
-3. Install FFmpeg and add its executable folder to `PATH`. Open a new **Windows PowerShell** window and check:
+With FFmpeg on your `PATH`, copy `FrontierUtopia.dll` from your [UCSH installation](https://tmafe.com/ucsh_latest.html) (usually `C:\Program Files (x86)\UCSH`) beside the scripts. Keep all `.cs` and `.ps1` files together, then open Windows PowerShell in that folder:
 
-   ```powershell
-   ffmpeg -version
-   ffprobe -version
-   ```
+```powershell
+.\Build-And-Export-v5.ps1 -Actor 'C:\Actors\will.act' -Scale 2 -WebP -Output .\WillOutput
+```
 
-4. Open PowerShell in the exporter folder. Run this command, replacing the actor path with your own:
-
-   ```powershell
-   .\Build-And-Export-v5.ps1 -Actor 'C:\Actors\will.act' -Scale 2 -WebP -Output .\WillOutput
-   ```
-
-The script compiles the exporter automatically, renders the animations, and creates MP4 and WebP files in `WillOutput`. The first export can take a while, especially for long idle showcases. Relative paths resolve beside the scripts.
-
-If Windows blocks a downloaded script, review the files, then use `Unblock-File` on the scripts you downloaded. If your PowerShell execution policy blocks scripts, use an execution policy permitted by your Windows environment.
+Replace the actor path with your own. The script builds automatically and saves MP4 and WebP files in `WillOutput`. Relative paths resolve beside the scripts.
 
 ## Export a whole folder
 
@@ -113,48 +102,36 @@ To export your own copy of Scribble with this background:
 .\Build-And-Export-v5.ps1 -Actor 'C:\Actors\scribble.act' -Scale 2 -WebP -BackgroundImage .\docs\media\office97-background-smooth.png -Output .\ScribbleOutput
 ```
 
-## How loops and idle showcases work
+## Idle animations and loops
 
-**Finite actions** play through to completion.
-
-**Deterministic loops** take an identified exit on the third pass by default. The final pass may be partial. `-Cycles 2` selects the second pass; `-Cycles 0` keeps the raw intro-plus-one-cycle behavior for deterministic loops and bounded samples for random loops.
-
-**Random cyclic actions** use a fixed seed, a time budget, and an instruction safety limit. After sampling, the exporter follows a legal natural return or an identified controlled ending when available. This ending can extend the clip beyond the sample budget. Cases without an ending stay bounded and are marked `no_ending_found`.
-
-**Full idle showcases** cover the reachable idle repertoire in a fixed order and are not time-capped. When the branches reconnect, the exporter creates one continuous walk. When they cannot reconnect, it assembles separate valid action paths into one showcase, placing the engine's normal rest pose between sections for 250 ms. Frame and sound timing within each section is preserved.
-
-Showcases present the repertoire in a repeatable order rather than reproducing the original random probabilities. Rest-pose resets can be visible when the source has no transition back to rest. Separate variant PNGs and metadata remain as assembly inputs; variant movies are only created with `-DebugVariants`.
-
-### Why a short idle export can miss animations
-
-An idle action is a small program with jumps and random choices, rather than a single list of frames. One choice might return to the resting pose, while another starts a longer activity, such as Will's writing animation. A short random recording can revisit the same branch repeatedly and finish before reaching the others.
-
-The diagram below is a simplified illustration, not a literal map of Will's instructions:
+Idle animations randomly choose between different activities. A short sample can miss some of them, such as Will's writing animation. This simplified diagram shows the idea:
 
 ```mermaid
-flowchart TD
-    Entry[Start idle action] --> Choice{Random branch}
-    Choice --> A[Short idle movement]
-    Choice --> B[Longer activity, such as writing]
-    Choice --> C[Another idle movement]
+flowchart LR
+    Choice{Idle choice} --> A[Small movement]
+    Choice --> B[Writing]
+    Choice --> C[Another activity]
     A --> Choice
     B --> Choice
     C --> Choice
 ```
 
-The showcase replaces random selection with a fixed plan that covers every reachable instruction transition. It follows actual connecting paths between branches; simply ignoring a jump could skip artwork or leave an activity unfinished. Coverage describes the graph's transitions, not every possible combination or number of repetitions.
+The exporter makes two versions:
 
-Some actors have one-way branches that cannot reconnect. In that case, the exporter makes complete sections starting from the action entry, then joins them into the final showcase:
+- **`actionIdle`**: a short, repeatable random sample.
+- **`actionIdle_showcase`**: the reachable idle branches played in a fixed order, assembled into one clip.
+
+When branches cannot reconnect, the showcase joins separate sections with a brief rest pose and an action restart:
 
 ```mermaid
 flowchart LR
-    A[Valid idle section A] --> R1[Rest pose: 250 ms]
-    R1 --> B[Restart action: section B]
-    B --> R2[Rest pose: 250 ms]
-    R2 --> C[Restart action: section C]
+    A[Activity A] --> R[Rest pose: 250 ms]
+    R --> B[Restart: activity B]
 ```
 
-These are explicit action restarts, not invented transitions inside the original program. You receive one `action_001_actionIdle_showcase` file; the underlying variants are assembly inputs, and separate variant movies are optional debug output.
+These resets can be visible. Separate variant movies are only produced with `-DebugVariants`.
+
+Other finite actions play in full. Repeating actions use `-Cycles 3` by default and take an ending when available; the final cycle may be partial. Random samples use `-MaxLoopSeconds` and may run longer to finish an ending. `-Cycles 0` keeps one deterministic cycle or a bounded random sample. The full idle showcase is not time-capped.
 
 ## Audio and playback
 
