@@ -7,7 +7,7 @@ foreach($actor in Get-ChildItem -LiteralPath $root -Directory) {
     $manifest=Join-Path $actor.FullName 'actions.csv'
     if(-not (Test-Path -LiteralPath $manifest)){continue}
     $actors++
-    foreach($dir in Get-ChildItem -LiteralPath $actor.FullName -Directory -Filter 'action_*') {
+    foreach($dir in Get-ChildItem -LiteralPath $actor.FullName -Directory | Where-Object { $_.Name -match '^\d{3,}_' }) {
         if(Test-Path -LiteralPath (Join-Path $dir.FullName 'segments.csv')){Test-IdleAssembly $dir.FullName -Media;$videos++;continue}
         if(-not (Test-Path -LiteralPath (Join-Path $dir.FullName 'opcodes.csv'))){continue}
         $ops=@(Import-Csv -LiteralPath (Join-Path $dir.FullName 'opcodes.csv'))
@@ -46,7 +46,7 @@ foreach($actor in Get-ChildItem -LiteralPath $root -Directory) {
         }
         $traces++
     }
-    foreach($edgeFile in @((Join-Path $actor.FullName 'action_001_actionIdle_showcase\edges.csv'),(Join-Path $actor.FullName 'idle_variant_coverage.csv'))){
+    foreach($edgeFile in @((Join-Path $actor.FullName '001_idle_showcase\edges.csv'),(Join-Path $actor.FullName 'idle_variant_coverage.csv'))){
         if(Test-Path -LiteralPath $edgeFile){$edges=@(Import-Csv -LiteralPath $edgeFile);if(@($edges | Where-Object {$_.covered -ne 'yes'}).Count){throw "Incomplete idle coverage: $($actor.Name)"}}
     }
     Write-Host ('PASS '+$actor.Name+': instruction transitions and frame/sound timing match; MP4s decode.')

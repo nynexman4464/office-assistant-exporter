@@ -59,8 +59,13 @@ partial class WillActorExporter
         {115, "actionGestureUp"},
         {116, "actionEmptyTrash"},
     };
-    static string ActionName(int id) { string name; return Names.TryGetValue(id,out name) ? name : "actionUnknown"; }
-    static string Folder(int id) { return "action_"+id.ToString("D3")+"_"+ActionName(id); }
+    static string ActionName(int id) {
+        string name;
+        if(!Names.TryGetValue(id,out name))return "unknown";
+        if(name.StartsWith("action",StringComparison.Ordinal))name=name.Substring(6);
+        return char.ToLowerInvariant(name[0])+name.Substring(1);
+    }
+    static string Folder(int id) { return id.ToString("D3")+"_"+ActionName(id); }
     static string Kind(ActionInfo a) { return !a.HasCycle?"finite":a.RandomCycle?(a.MayExit?"random_possible_loop":"random_no_exit"):"deterministic_loop"; }
     class Op { public int Code, A, B; }
     class ActionInfo { public int Id, Count, Branches, LoopEntry = -1, LoopPoseIndex = -1; public bool HasCycle, MayExit, RandomCycle; public List<Op> Ops; }

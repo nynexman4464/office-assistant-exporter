@@ -83,7 +83,7 @@ partial class WillActorExporter
             f.WriteLine("from_instruction,to_instruction,covered");foreach(var e in edges)f.WriteLine(e.Item1+","+e.Item2+","+CsvBool(done.Contains(Edge(e.Item1,e.Item2))));
         }
         File.WriteAllText(Path.Combine(folder,"showcase.txt"),"Fixed numeric edge order; shortest valid connecting paths; not original random playback."+Environment.NewLine+"covered_edges="+done.Count+"/"+edges.Count+Environment.NewLine);
-        File.WriteAllText(Path.Combine(output,"showcase_summary.csv"),"action_id,action_name,folder,mp4,frames,duration_ms,sound_triggers,covered_edges,total_edges"+Environment.NewLine+"1,actionIdle,"+Folder(a.Id)+"_showcase,"+Folder(a.Id)+"_showcase.mp4,"+t.Frames.Count+","+t.Ms+","+t.Sounds.Count+","+done.Count+","+edges.Count+Environment.NewLine);
+        File.WriteAllText(Path.Combine(output,"showcase_summary.csv"),"action_id,action_name,folder,mp4,frames,duration_ms,sound_triggers,covered_edges,total_edges"+Environment.NewLine+"1,"+ActionName(a.Id)+","+Folder(a.Id)+"_showcase,"+Folder(a.Id)+"_showcase.mp4,"+t.Frames.Count+","+t.Ms+","+t.Sounds.Count+","+done.Count+","+edges.Count+Environment.NewLine);
         Console.WriteLine("Idle showcase: "+visited.Count+" instructions; "+done.Count+"/"+edges.Count+" edges; "+t.Ms+" ms");return t;
     }
     static void ExtractSounds(ActEngine e,string output) {

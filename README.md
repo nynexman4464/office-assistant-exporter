@@ -41,9 +41,9 @@ Each `.ACT` file directly inside that folder gets its own output subfolder. Subf
 
 | Output | Purpose |
 | --- | --- |
-| `action_001_actionIdle_showcase.mp4` | Full idle repertoire, automatically assembled into one usable video. |
-| `action_001_actionIdle.mp4` | Short, repeatable sample of the original random idle behavior. |
-| Other `action_###_actionName.mp4` files | Individual actions with sound effects. |
+| `001_idle_showcase.mp4` | Full idle repertoire, automatically assembled into one usable video. |
+| `001_idle.mp4` | Short, repeatable sample of the original random idle behavior. |
+| Other `###_characterSuccessMajor.mp4` files | Individual actions with sound effects. |
 | Matching `.webp` files | Animated images with transparency by default; no audio. Requires `-WebP`. |
 | Action subfolders | Source PNG frames, timing data, and playback reports. |
 | `sounds/` | Original extracted WAV sound effects. |
@@ -118,8 +118,8 @@ flowchart LR
 
 The exporter makes two versions:
 
-- **`actionIdle`**: a short, repeatable random sample.
-- **`actionIdle_showcase`**: the reachable idle branches played in a fixed order, assembled into one clip.
+- **`idle`**: a short, repeatable random sample.
+- **`idle_showcase`**: the reachable idle branches played in a fixed order, assembled into one clip.
 
 When branches cannot reconnect, the showcase joins separate sections with a brief rest pose and an action restart:
 

@@ -18,7 +18,7 @@ if(-not $NoMP4){
     }
 }
 Add-Type -AssemblyName System.Drawing
-foreach($dir in Get-ChildItem -LiteralPath $outFull -Directory -Filter 'action_*'){
+foreach($dir in Get-ChildItem -LiteralPath $outFull -Directory | Where-Object { $_.Name -match '^\d{3,}_' }){
     if(-not $DebugVariants -and $dir.Name -match '_variant_\d+$'){continue}
     $concat=Join-Path $dir.FullName 'animation.ffconcat'
     if(-not (Test-Path -LiteralPath (Join-Path $dir.FullName 'export.complete')) -or -not (Test-Path -LiteralPath $concat)){continue}

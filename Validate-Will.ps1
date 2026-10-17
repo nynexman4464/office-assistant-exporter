@@ -18,7 +18,7 @@ try {
             if($frames[-1].pose_id -ne '160'){throw 'Action did not return to neutral'}
         }
     }
-    foreach($dir in Get-ChildItem -LiteralPath $root -Directory -Filter 'action_*'){
+    foreach($dir in Get-ChildItem -LiteralPath $root -Directory | Where-Object { $_.Name -match '^\d{3,}_' }){
         if(-not (Test-Path (Join-Path $dir.FullName 'opcodes.csv'))){continue}
         $ops=@(Import-Csv -LiteralPath (Join-Path $dir.FullName 'opcodes.csv'))
         $path=@(Import-Csv -LiteralPath (Join-Path $dir.FullName 'instructions.csv'))
@@ -44,7 +44,7 @@ try {
         if($cues.Count -ne $sounds.Count){throw 'Sound trigger count mismatch'}
         for($i=0;$i -lt $cues.Count;$i++){if(($cues[$i].instruction+','+$cues[$i].start_ms+','+$cues[$i].sound_id) -ne $sounds[$i]){throw 'Sound timing mismatch'}}
     }
-    $showcase=Join-Path $root 'action_001_actionIdle_showcase'
+    $showcase=Join-Path $root '001_idle_showcase'
     $edges=@(Import-Csv -LiteralPath (Join-Path $showcase 'edges.csv'))
     if($edges.Count -ne 58 -or @($edges | Where-Object {$_.covered -ne 'yes'}).Count){throw 'Missed idle edge'}
     if(@(Get-ChildItem -LiteralPath (Join-Path $root 'sounds') -Filter *.wav).Count -ne 29){throw 'Missing WAVs'}
