@@ -17,3 +17,6 @@ ActorExports/
 .vs/
 bin/
 obj/
+
+# Selected README demonstration
+!docs/media/will-idle.webp

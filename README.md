@@ -4,6 +4,12 @@ Export classic Microsoft Actor (`.ACT`) animations as MP4 videos, animated WebP 
 
 Built with AI assistance using OpenAI Codex for implementation, documentation, and validation work. See [VALIDATION.txt](VALIDATION.txt) for recorded export checks.
 
+### Example: Will's idle showcase
+
+![Will performing his idle animation repertoire](docs/media/will-idle.webp)
+
+A transparent animated WebP exported at 2× scale. The showcase includes the reachable idle branches, rather than just a short random sample. This example contains original character artwork; the repository's code license does not apply to it.
+
 ## Requirements
 
 - **Windows PowerShell 5.1** and **.NET Framework 4.x**. The scripts use the Framework compiler; a .NET SDK is not required.
@@ -106,6 +112,37 @@ You can combine a background image with a color: transparent parts of the image 
 **Full idle showcases** cover the reachable idle repertoire in a fixed order and are not time-capped. When the branches reconnect, the exporter creates one continuous walk. When they cannot reconnect, it assembles separate valid action paths into one showcase, placing the engine's normal rest pose between sections for 250 ms. Frame and sound timing within each section is preserved.
 
 Showcases present the repertoire in a repeatable order rather than reproducing the original random probabilities. Rest-pose resets can be visible when the source has no transition back to rest. Separate variant PNGs and metadata remain as assembly inputs; variant movies are only created with `-DebugVariants`.
+
+### Why a short idle export can miss animations
+
+An idle action is a small program with jumps and random choices, rather than a single list of frames. One choice might return to the resting pose, while another starts a longer activity, such as Will's writing animation. A short random recording can revisit the same branch repeatedly and finish before reaching the others.
+
+The diagram below is a simplified illustration, not a literal map of Will's instructions:
+
+```mermaid
+flowchart TD
+    Entry[Start idle action] --> Choice{Random branch}
+    Choice --> A[Short idle movement]
+    Choice --> B[Longer activity, such as writing]
+    Choice --> C[Another idle movement]
+    A --> Choice
+    B --> Choice
+    C --> Choice
+```
+
+The showcase replaces random selection with a fixed plan that covers every reachable instruction transition. It follows actual connecting paths between branches; simply ignoring a jump could skip artwork or leave an activity unfinished. Coverage describes the graph's transitions, not every possible combination or number of repetitions.
+
+Some actors have one-way branches that cannot reconnect. In that case, the exporter makes complete sections starting from the action entry, then joins them into the final showcase:
+
+```mermaid
+flowchart LR
+    A[Valid idle section A] --> R1[Rest pose: 250 ms]
+    R1 --> B[Restart action: section B]
+    B --> R2[Rest pose: 250 ms]
+    R2 --> C[Restart action: section C]
+```
+
+These are explicit action restarts, not invented transitions inside the original program. You receive one `action_001_actionIdle_showcase` file; the underlying variants are assembly inputs, and separate variant movies are optional debug output.
 
 ## Audio and playback
 
