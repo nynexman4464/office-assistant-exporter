@@ -1,114 +1,155 @@
 # Office Assistant Exporter
 
-Actor Exporter v5 - usable full idle clips, optional debug variants
+Export classic Microsoft Actor (`.ACT`) animations as MP4 videos, animated WebP files, PNG frames, and timing reports. Includes original sound effects in MP4, readable action names, and automatically assembled full idle showcases.
 
-Credit to [Universal Character Scripting Helper (UCSH)](https://tmafe.com/ucsh)
-by Konnor88 / TMAFE. This exporter uses the Frontier Actor library distributed
-with UCSH (`FrontierUtopia.dll`) to load and render ACT characters, and the
-standard action names come from UCSH's `defaultactions.h`.
+Built with AI assistance using OpenAI Codex for implementation, documentation, and validation work. See [VALIDATION.txt](VALIDATION.txt) for recorded export checks.
 
-Download UCSH from its [official download page](https://tmafe.com/ucsh_latest.html).
-After installing it, copy `FrontierUtopia.dll` from the UCSH installation folder
-(typically `C:\Program Files (x86)\UCSH`) beside this exporter's scripts.
-The DLL and character files are not included in this repository.
+## Requirements
 
-UCSH, its library, and the original character artwork and sounds are separate
-from this exporter and retain their respective ownership and licenses.
+- **Windows PowerShell 5.1** and **.NET Framework 4.x**. The scripts use the Framework compiler; a .NET SDK is not required.
+- **[Universal Character Scripting Helper (UCSH)](https://tmafe.com/ucsh)** for `FrontierUtopia.dll`.
+- **[FFmpeg](https://ffmpeg.org/download.html)** available on your `PATH`, with H.264, AAC, and animated WebP encoding support. Validation also uses `ffprobe`.
+- Your own **`.ACT` character files**. Microsoft Agent `.ACS` files are not supported.
 
-Place all included scripts and C# files beside FrontierUtopia.dll. Requires
-Windows PowerShell 5.1, .NET Framework 4.x and FFmpeg in PATH. FFprobe is used
-only by validation scripts. Original ACT/DLL and FFmpeg are not bundled.
+UCSH, FFmpeg, and character files are not bundled.
 
-One actor:
-  .\Build-And-Export-v5.ps1 -Actor .\will.act -Scale 2 -WebP -Output .\WillOutput
+## Quick start
 
-Whole folder (one output subfolder per ACT):
-  .\Export-Actors.ps1 -ActorsDirectory 'C:\Actors' -Scale 2 -WebP -Output .\OfficeExports
+1. Clone or download this repository and extract it to a folder you can write to. Keep all `.cs` and `.ps1` files together.
+2. [Download and install UCSH](https://tmafe.com/ucsh_latest.html). Copy `FrontierUtopia.dll` from its installation folder (typically `C:\Program Files (x86)\UCSH`) into the exporter folder.
+3. Install FFmpeg and add its executable folder to `PATH`. Open a new **Windows PowerShell** window and check:
 
-Use action_001_actionIdle_showcase.mp4 (or .webp) as the complete idle clip.
-You no longer need to assemble the separate variants yourself.
+   ```powershell
+   ffmpeg -version
+   ffprobe -version
+   ```
 
-When one valid continuous graph walk covers the idle repertoire, it is rendered
-directly. When one-way branches cannot reconnect, the exporter builds valid
-entry-to-ending paths, plays them in a fixed order, and assembles them into ONE
-showcase automatically. Each independent section is followed by the engine's
-normal ImageShow rest pose for 250 ms before the next action restart. Source
-frame and sound timing within each section is unchanged. Segment boundaries
-are documented action restarts rather than invented bytecode connections.
+4. Open PowerShell in the exporter folder. Run this command, replacing the actor path with your own:
 
-Original endings are used when present. If a branch has no transition back to
-rest, the normal rest-pose reset can still be visible; the exporter does not
-invent interpolated artwork. The showcase is a deterministic presentation of
-the repertoire, not the original random probabilities or choreography.
+   ```powershell
+   .\Build-And-Export-v5.ps1 -Actor 'C:\Actors\will.act' -Scale 2 -WebP -Output .\WillOutput
+   ```
 
-The ordinary action_001_actionIdle.mp4 remains a short seeded sample. Select
-the idle_showcase file for the complete assembled repertoire.
+The script compiles the exporter automatically, renders the animations, and creates MP4 and WebP files in `WillOutput`. The first export can take a while, especially for long idle showcases. Relative paths resolve beside the scripts.
 
-Individual variant MP4/WebP files are DEBUG OUTPUT and are disabled by default.
-Use -DebugVariants if desired. Variant PNGs and metadata remain as source data
-for building the combined clip. Use a new output folder for a clean set when
-upgrading; old debug movies in an existing folder are not deleted automatically.
+If Windows blocks a downloaded script, review the files, then use `Unblock-File` on the scripts you downloaded. If your PowerShell execution policy blocks scripts, use an execution policy permitted by your Windows environment.
 
-Sound is retained in MP4. Original WAVs are preserved in sounds\ and cue times
-are in sound_events.csv. A streamed 48kHz stereo PCM timeline reproduces the
-default single sound channel: the next cue replaces the previous one, and gaps
-are silent. The final cue may finish after the last animation frame. This avoids
-Windows command-length limits and large delayed-sound filter graphs on long
-idle assemblies. PCM cache/timeline files are rebuildable intermediates.
-Speech synthesis is not generated. WebP has no audio track.
+## Export a whole folder
 
-Scaling is artwork-aware. -Scale 2 means 384x288 for the supplied vector actors.
-Bitmap, mixed or unknown artwork stays at its original size by default (typically
-192x144). Detection inspects the artwork, not names. -ScaleBitmaps overrides this.
-Console output and artwork.csv report requested/effective scale and dimensions.
+```powershell
+.\Export-Actors.ps1 -ActorsDirectory 'C:\Actors' -Scale 2 -WebP -Output .\OfficeExports
+```
 
-Backgrounds are optional:
-  .\Build-And-Export-v5.ps1 -Actor .\will.act -Scale 2 -WebP -BackgroundImage 'C:\Images\desk.jpg'
-  .\Build-And-Export-v5.ps1 -Actor .\will.act -WebP -Background '#E8E0D0'
+Each `.ACT` file directly inside that folder gets its own output subfolder. Subfolders are not searched. `batch.csv` records each actor's result, dimensions, and any error. If one actor fails, the runner continues with the remaining actors and reports the failure at the end.
 
-PNG/WebP defaults to transparent, with no image background. Images use a centered
-cover crop without distortion. Transparent image areas reveal Background, which
-can be Transparent, a .NET color name or quoted #RRGGBB. MP4 uses a dark backing
-when source pixels remain transparent. Background settings/content hashes and
-effective scale participate in completion signatures.
+## Which files should I use?
 
-Finite actions finish in full. Ordinary deterministic loops take an identified
-exit on the third pass by default; the last pass may be partial. -Cycles 2 exits
-on the second pass. -Cycles 0 retains raw one-cycle/bounded sample behavior.
-Random cyclic samples have a time budget (-MaxLoopSeconds, default 10 for one
-actor, 3 for the folder runner) and an instruction cap. After sampling, a legal
-natural return or identified controlled ending is followed when available.
-Finishing can extend the clip beyond the sample budget. No-ending cases remain
-bounded and are marked no_ending_found. The full idle tour is not time-capped.
+| Output | Purpose |
+| --- | --- |
+| `action_001_actionIdle_showcase.mp4` | Full idle repertoire, automatically assembled into one usable video. |
+| `action_001_actionIdle.mp4` | Short, repeatable sample of the original random idle behavior. |
+| Other `action_###_actionName.mp4` files | Individual actions with sound effects. |
+| Matching `.webp` files | Animated images with transparency by default; no audio. Requires `-WebP`. |
+| Action subfolders | Source PNG frames, timing data, and playback reports. |
+| `sounds/` | Original extracted WAV sound effects. |
 
-MP4 is H.264/AAC, 60fps, with a half-second final pose hold. frames.csv preserves
-the integer-ms source timing; displayed MP4 timing is quantized to its 60fps grid.
-WebP repeats its entire clip, including any intro and ending. Loop metadata does
-not encode an intro-once/inner-loop playback rule into a standalone media file.
+Standard action names come from UCSH's `defaultactions.h`; unknown action IDs keep their numeric identifier.
 
-Other options: -NoMP4 -WebP for WebP only; -NoMP4 alone for frames/reports;
--Mode analyze; -NoShowcase (single actor); -Force; -DebugVariants. Relative paths
-resolve beside the scripts. Rebuild with -Force after changing ACT/DLL/source.
-The older Build-And-Export-v4.ps1 name is retained as a compatible entry point.
+## Common options
 
-Reports: actions.csv, analysis.csv, artwork.csv, frames.csv, sound_events.csv,
-opcodes.csv, instructions.csv, playback.csv, coverage/edge CSVs. Assembled idles
-have segments.csv, source_variant columns and assembly.txt instead of pretending
-their restarts are one instruction path. Unknown action IDs retain their numbers.
-UCSH defaultactions.h supplies standard names.
+These options work with both the single-actor and folder scripts unless noted.
 
-Checks:
-  .\Validate-Actors.ps1 -Output .\OfficeExports
-  .\Validate-Audio.ps1
-  .\Validate-Scaling.ps1 -Actors 'E:\OFFICE\ACTORS' -Render
-  .\Validate-Backgrounds.ps1 -Actor .\will.act
+| Option | Behavior |
+| --- | --- |
+| `-Scale 2` | Render vector artwork at twice its original dimensions. Accepts 1–12. Default: 4 for a single actor, 2 for a folder. |
+| `-ScaleBitmaps` | Apply the requested scale to bitmap, mixed, and unknown artwork too. Otherwise they stay at native size. |
+| `-WebP` | Create animated WebP files alongside MP4. |
+| `-NoMP4 -WebP` | Create WebP files without MP4. |
+| `-NoMP4` | Export frames and reports without encoding videos. |
+| `-Background '#E8E0D0'` | Fill transparent areas with a color. Accepts .NET color names, quoted `#RRGGBB`, or `Transparent`. |
+| `-BackgroundImage 'C:\Images\desk.jpg'` | Add a background image, centered and cropped to fill the canvas without stretching. |
+| `-Cycles 3` | Take an identified ending on the third loop pass when available. Accepts 0–10; default 3. |
+| `-MaxLoopSeconds 10` | Set the sample budget for random cyclic actions. Default: 10 for a single actor, 3 for a folder. |
+| `-Mode analyze` | Write analysis reports without rendering frames or encoding media. |
+| `-Force` | Rebuild existing output. Use after changing an ACT file, DLL, or exporter source. |
+| `-DebugVariants` | Also encode the separate idle variant videos used to assemble a showcase. |
+| `-NoShowcase` | Skip the full idle showcase. Single-actor script only. |
 
-Validation checks raw paths, documented exit overrides, frame/sound timings,
-idle edge coverage and decoding. Assembled idle sections are checked against
-their original variant frames/cues and their declared rest frames. The audio
-test checks cue placement, interruption, repeated cues, silence gaps and WAV
-decoding. Optional -DebugVariants on Validate-Actors validates debug media too.
+### Scaling
 
-Known library limits: these tools read ACT, not Agent ACS. Source metadata and
-private FrontierUtopia fields are version-sensitive. The supplied ZVISIBLE
-character identifies itself as Invisible and has no visible rendered pixels.
+Artwork detection examines the resources inside each actor. Pure vector artwork uses the requested scale; bitmap, mixed, or unknown artwork stays at its original size unless you use `-ScaleBitmaps`. For a 192×144 vector actor, `-Scale 2` produces 384×288 media.
+
+The console and `artwork.csv` report the detected type and effective dimensions.
+
+### Backgrounds and transparency
+
+PNG frames and WebP files default to transparent backgrounds. MP4 uses a dark backing wherever pixels remain transparent.
+
+```powershell
+# Image background
+.\Build-And-Export-v5.ps1 -Actor 'C:\Actors\will.act' -Scale 2 -WebP -BackgroundImage 'C:\Images\desk.jpg'
+
+# Solid color background
+.\Build-And-Export-v5.ps1 -Actor 'C:\Actors\will.act' -Scale 2 -WebP -Background '#E8E0D0'
+```
+
+You can combine a background image with a color: transparent parts of the image reveal that color. Background settings, image content hashes, and effective scale participate in output completion signatures.
+
+## How loops and idle showcases work
+
+**Finite actions** play through to completion.
+
+**Deterministic loops** take an identified exit on the third pass by default. The final pass may be partial. `-Cycles 2` selects the second pass; `-Cycles 0` keeps the raw intro-plus-one-cycle behavior for deterministic loops and bounded samples for random loops.
+
+**Random cyclic actions** use a fixed seed, a time budget, and an instruction safety limit. After sampling, the exporter follows a legal natural return or an identified controlled ending when available. This ending can extend the clip beyond the sample budget. Cases without an ending stay bounded and are marked `no_ending_found`.
+
+**Full idle showcases** cover the reachable idle repertoire in a fixed order and are not time-capped. When the branches reconnect, the exporter creates one continuous walk. When they cannot reconnect, it assembles separate valid action paths into one showcase, placing the engine's normal rest pose between sections for 250 ms. Frame and sound timing within each section is preserved.
+
+Showcases present the repertoire in a repeatable order rather than reproducing the original random probabilities. Rest-pose resets can be visible when the source has no transition back to rest. Separate variant PNGs and metadata remain as assembly inputs; variant movies are only created with `-DebugVariants`.
+
+## Audio and playback
+
+- MP4 uses **H.264/AAC at 60 fps**, with a half-second final pose hold.
+- Original sound effects are preserved as WAV files and scheduled on one sound channel: each new cue replaces the previous cue, and gaps are silent. The final cue may finish after the final animation frame.
+- Speech synthesis is not generated. WebP has no audio track.
+- `frames.csv` preserves source timing in integer milliseconds. MP4 timing is rounded to its 60 fps grid.
+- WebP repeats the entire clip, including any intro and ending. It does not play an intro once and then repeat only an inner loop.
+
+## Reports and validation
+
+`actions.csv` indexes the exported actions. `analysis.csv` describes their instruction graphs and loop classifications. Each action also has frame, sound, instruction, opcode, and playback reports. Showcase coverage reports describe visited instructions and edges; assembled showcases include `segments.csv`, source-variant columns, and `assembly.txt` documenting the restarts.
+
+To validate a folder export:
+
+```powershell
+.\Validate-Actors.ps1 -Output .\OfficeExports
+```
+
+Additional checks:
+
+```powershell
+.\Validate-Audio.ps1
+.\Validate-Scaling.ps1 -Actors 'C:\Actors' -Render
+.\Validate-Backgrounds.ps1 -Actor 'C:\Actors\will.act'
+```
+
+Validation checks instruction transitions, documented exit overrides, frame and sound timing, idle coverage, and media decoding. Assembled showcase sections are compared with their source variants and declared rest frames. Add `-DebugVariants` to `Validate-Actors.ps1` to require debug media checks too.
+
+## Troubleshooting and limitations
+
+- **Missing DLL:** copy `FrontierUtopia.dll` beside the scripts, rather than into the output folder.
+- **FFmpeg not found:** ensure its executable folder is on `PATH`, then open a new PowerShell window.
+- **Old results after changing inputs:** rerun with `-Force`. ACT, DLL, and source changes are not automatically detected by the completion cache.
+- **Extra variant movies after upgrading:** use a new output folder for a clean export. Old files are not deleted automatically.
+- **Unexpected bitmap dimensions:** native-size preservation is intentional. Use `-ScaleBitmaps` to override it.
+- The exporter reads private FrontierUtopia fields, so compatibility can depend on the installed library version.
+- The `ZVISIBLE` character identifies itself as Invisible and has no visible rendered pixels.
+- `Build-And-Export-v4.ps1` remains as a compatible entry point; new users should use `Build-And-Export-v5.ps1`.
+
+## Credits and license
+
+Credit to **[Universal Character Scripting Helper (UCSH)](https://tmafe.com/ucsh)** and **Konnor88 / TMAFE**. The exporter uses the Frontier Actor library distributed with UCSH (`FrontierUtopia.dll`) to load and render ACT characters. Standard action names come from UCSH's `defaultactions.h`.
+
+Get UCSH from its [official download page](https://tmafe.com/ucsh_latest.html).
+
+The exporter code is covered by this repository's [BSD 3-Clause license](LICENSE). That license does not cover UCSH, Frontier Actor, FFmpeg, or original character artwork and sounds; those remain subject to their respective terms. This repository does not distribute the UCSH DLL or character assets.
