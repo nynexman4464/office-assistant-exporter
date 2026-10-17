@@ -2,7 +2,7 @@
 
 Export classic Microsoft Actor (`.ACT`) animations as MP4 videos, animated WebP files, PNG frames, and timing reports. Includes original sound effects in MP4, readable action names, and automatically assembled full idle showcases.
 
-Built with AI assistance using OpenAI Codex for implementation, documentation, and validation work. See [VALIDATION.txt](VALIDATION.txt) for recorded export checks.
+Built with AI assistance using OpenAI Codex for implementation, documentation, and validation work.
 
 ### Example: Will's idle showcase
 

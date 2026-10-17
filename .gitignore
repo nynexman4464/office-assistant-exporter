@@ -20,3 +20,6 @@ obj/
 
 # Selected README demonstration
 !docs/media/will-idle.webp
+
+# Local validation run report
+/VALIDATION.txt
