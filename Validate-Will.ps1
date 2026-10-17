@@ -2,7 +2,7 @@ param([string]$Output='.\WillOutput-Endings',[switch]$Render)
 $ErrorActionPreference='Stop'
 Push-Location $PSScriptRoot
 try {
-    if($Render){& .\Build-And-Export-v4.ps1 -Scale 1 -MaxLoopSeconds 1 -Output $Output -Force}
+    if($Render){& .\Build-And-Export.ps1 -Scale 1 -MaxLoopSeconds 1 -Output $Output -Force}
     & .\WillActorExporter.exe --self-test
     if($LASTEXITCODE -ne 0){throw 'Logic tests failed'}
     $root=(Resolve-Path -LiteralPath $Output).Path

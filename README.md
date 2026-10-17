@@ -24,7 +24,7 @@ UCSH, FFmpeg, and character files are not bundled.
 With FFmpeg on your `PATH`, copy `FrontierUtopia.dll` from your [UCSH installation](https://tmafe.com/ucsh_latest.html) (usually `C:\Program Files (x86)\UCSH`) beside the scripts. Keep all `.cs` and `.ps1` files together, then open Windows PowerShell in that folder:
 
 ```powershell
-.\Build-And-Export-v5.ps1 -Actor 'C:\Actors\will.act' -Scale 2 -WebP -Output .\WillOutput
+.\Build-And-Export.ps1 -Actor 'C:\Actors\will.act' -Scale 2 -WebP -Output .\WillOutput
 ```
 
 Replace the actor path with your own. The script builds automatically and saves MP4 and WebP files in `WillOutput`. Relative paths resolve beside the scripts.
@@ -82,10 +82,10 @@ PNG frames and WebP files default to transparent backgrounds. MP4 uses a dark ba
 
 ```powershell
 # Image background
-.\Build-And-Export-v5.ps1 -Actor 'C:\Actors\will.act' -Scale 2 -WebP -BackgroundImage 'C:\Images\desk.jpg'
+.\Build-And-Export.ps1 -Actor 'C:\Actors\will.act' -Scale 2 -WebP -BackgroundImage 'C:\Images\desk.jpg'
 
 # Solid color background
-.\Build-And-Export-v5.ps1 -Actor 'C:\Actors\will.act' -Scale 2 -WebP -Background '#E8E0D0'
+.\Build-And-Export.ps1 -Actor 'C:\Actors\will.act' -Scale 2 -WebP -Background '#E8E0D0'
 ```
 
 You can combine a background image with a color: transparent parts of the image reveal that color. Background settings, image content hashes, and effective scale participate in output completion signatures.
@@ -99,7 +99,7 @@ Scribble's short idle sample at 2× scale, with an Office-like background.
 To export your own copy of Scribble with this background:
 
 ```powershell
-.\Build-And-Export-v5.ps1 -Actor 'C:\Actors\scribble.act' -Scale 2 -WebP -BackgroundImage .\docs\media\office97-background-smooth.png -Output .\ScribbleOutput
+.\Build-And-Export.ps1 -Actor 'C:\Actors\scribble.act' -Scale 2 -WebP -BackgroundImage .\docs\media\office97-background-smooth.png -Output .\ScribbleOutput
 ```
 
 ## Idle animations and loops
@@ -170,7 +170,6 @@ Validation checks instruction transitions, documented exit overrides, frame and 
 - **Unexpected bitmap dimensions:** native-size preservation is intentional. Use `-ScaleBitmaps` to override it.
 - The exporter reads private FrontierUtopia fields, so compatibility can depend on the installed library version.
 - The `ZVISIBLE` character identifies itself as Invisible and has no visible rendered pixels.
-- `Build-And-Export-v4.ps1` remains as a compatible entry point; new users should use `Build-And-Export-v5.ps1`.
 
 ## Credits and license
 

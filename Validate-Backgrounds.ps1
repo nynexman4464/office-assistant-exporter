@@ -14,7 +14,7 @@ try {
     }
     function Pixel([string]$path,[int]$x=0) {$b=[Drawing.Bitmap]::FromFile($path);try{return $b.GetPixel($x,0)}finally{$b.Dispose()}}
     function Render([string]$color='Transparent',[string]$img='') {
-        & .\Build-And-Export-v4.ps1 -Actor $Actor -Scale 1 -MaxLoopSeconds 1 -Output $out -Background $color -BackgroundImage $img -NoMP4 -WebP
+        & .\Build-And-Export.ps1 -Actor $Actor -Scale 1 -MaxLoopSeconds 1 -Output $out -Background $color -BackgroundImage $img -NoMP4 -WebP
     }
     Render
     $png=Join-Path $out 'action_002_actionGreetingShow\frame_0000.png'
@@ -35,7 +35,7 @@ try {
     $modified=(Get-Item -LiteralPath $png).LastWriteTimeUtc;Render 'Transparent' $image
     if((Get-Item -LiteralPath $png).LastWriteTimeUtc -ne $modified){throw 'Unchanged background did not reuse cache'}
     if((Get-FileHash -LiteralPath $timeline).Hash -ne $framesHash -or (Get-FileHash -LiteralPath $audio).Hash -ne $audioHash){throw 'Background altered animation or sound timing'}
-    & .\Build-And-Export-v4.ps1 -Actor $Actor -Scale 1 -MaxLoopSeconds 1 -Output $out -BackgroundImage $image
+    & .\Build-And-Export.ps1 -Actor $Actor -Scale 1 -MaxLoopSeconds 1 -Output $out -BackgroundImage $image
     if(@(Get-ChildItem -LiteralPath $out -Filter *.mp4).Count -ne 36){throw 'Expected 36 MP4s'}
     & ffmpeg -v error -y -i (Join-Path $out 'action_002_actionGreetingShow.mp4') -frames:v 1 $decoded
     $corner=Pixel $decoded

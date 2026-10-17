@@ -21,7 +21,7 @@ try {
         $target=Join-Path $outputRoot $file.BaseName
         Write-Host ('Exporting '+$file.Name)
         try {
-            & .\Build-And-Export-v5.ps1 -Actor $file.FullName -Output $target -Scale $Scale -MaxLoopSeconds $MaxLoopSeconds -Cycles $Cycles -Mode $Mode -Background $Background -BackgroundImage $BackgroundImage -WebP:$WebP -NoMP4:$NoMP4 -Force:$Force -ScaleBitmaps:$ScaleBitmaps -DebugVariants:$DebugVariants
+            & .\Build-And-Export.ps1 -Actor $file.FullName -Output $target -Scale $Scale -MaxLoopSeconds $MaxLoopSeconds -Cycles $Cycles -Mode $Mode -Background $Background -BackgroundImage $BackgroundImage -WebP:$WebP -NoMP4:$NoMP4 -Force:$Force -ScaleBitmaps:$ScaleBitmaps -DebugVariants:$DebugVariants
             $art=Import-Csv -LiteralPath (Join-Path $target 'artwork.csv')
             $mp4=@(Get-ChildItem -LiteralPath $target -Filter *.mp4 | Where-Object {$DebugVariants -or $_.Name -notmatch '_variant_\d+\.mp4$'}).Count
             $webps=@(Get-ChildItem -LiteralPath $target -Filter *.webp | Where-Object {$DebugVariants -or $_.Name -notmatch '_variant_\d+\.webp$'}).Count

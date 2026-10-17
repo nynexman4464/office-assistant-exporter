@@ -4,7 +4,7 @@ Push-Location $PSScriptRoot
 try {
     $root=Join-Path $PSScriptRoot ('ScaleValidation-'+[DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss-fff'));New-Item -ItemType Directory -Path $root -Force | Out-Null
     # Compile using the same Windows PowerShell/.NET Framework path as users.
-    & .\Build-And-Export-v4.ps1 -Actor (Join-Path $Actors 'WILL.ACT') -Mode analyze -Scale 2 -Output (Join-Path $root 'WILL')
+    & .\Build-And-Export.ps1 -Actor (Join-Path $Actors 'WILL.ACT') -Mode analyze -Scale 2 -Output (Join-Path $root 'WILL')
     foreach($file in Get-ChildItem -LiteralPath $Actors -File -Filter *.ACT){
         $out=Join-Path $root $file.BaseName
         & .\WillActorExporter.exe $file.FullName $out 2 analyze 3 false none 3
@@ -13,12 +13,12 @@ try {
         $isBitmap=$file.BaseName -in 'GENIUS','MNATURE'
         if($r.kind -ne $(if($isBitmap){'bitmap'}else{'vector'}) -or $r.effective_scale -ne $(if($isBitmap){'1'}else{'2'})){throw "Unexpected scale policy: $($file.Name)"}
     }
-    & .\Build-And-Export-v4.ps1 -Actor (Join-Path $Actors 'GENIUS.ACT') -Mode analyze -Scale 2 -ScaleBitmaps -Output (Join-Path $root 'Override')
+    & .\Build-And-Export.ps1 -Actor (Join-Path $Actors 'GENIUS.ACT') -Mode analyze -Scale 2 -ScaleBitmaps -Output (Join-Path $root 'Override')
     $r=Import-Csv -LiteralPath (Join-Path $root 'Override\artwork.csv')
     if($r.effective_scale -ne '2' -or $r.scale_bitmaps_override -ne 'yes'){throw 'Bitmap override failed'}
     if($Render){
-        & .\Build-And-Export-v4.ps1 -Actor (Join-Path $Actors 'MNATURE.ACT') -Scale 2 -MaxLoopSeconds 3 -WebP -Output (Join-Path $root 'NativeBitmap')
-        & .\Build-And-Export-v4.ps1 -Actor (Join-Path $Actors 'CLIPPIT.ACT') -Scale 2 -MaxLoopSeconds 1 -NoMP4 -WebP -Output (Join-Path $root 'ScaledVector')
+        & .\Build-And-Export.ps1 -Actor (Join-Path $Actors 'MNATURE.ACT') -Scale 2 -MaxLoopSeconds 3 -WebP -Output (Join-Path $root 'NativeBitmap')
+        & .\Build-And-Export.ps1 -Actor (Join-Path $Actors 'CLIPPIT.ACT') -Scale 2 -MaxLoopSeconds 1 -NoMP4 -WebP -Output (Join-Path $root 'ScaledVector')
         Add-Type -AssemblyName System.Drawing
         foreach($test in @(@('NativeBitmap',192,144),@('ScaledVector',384,288))){
             $out=Join-Path $root $test[0]
