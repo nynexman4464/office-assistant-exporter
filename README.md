@@ -2,6 +2,19 @@
 
 Actor Exporter v5 - usable full idle clips, optional debug variants
 
+Credit to [Universal Character Scripting Helper (UCSH)](https://tmafe.com/ucsh)
+by Konnor88 / TMAFE. This exporter uses the Frontier Actor library distributed
+with UCSH (`FrontierUtopia.dll`) to load and render ACT characters, and the
+standard action names come from UCSH's `defaultactions.h`.
+
+Download UCSH from its [official download page](https://tmafe.com/ucsh_latest.html).
+After installing it, copy `FrontierUtopia.dll` from the UCSH installation folder
+(typically `C:\Program Files (x86)\UCSH`) beside this exporter's scripts.
+The DLL and character files are not included in this repository.
+
+UCSH, its library, and the original character artwork and sounds are separate
+from this exporter and retain their respective ownership and licenses.
+
 Place all included scripts and C# files beside FrontierUtopia.dll. Requires
 Windows PowerShell 5.1, .NET Framework 4.x and FFmpeg in PATH. FFprobe is used
 only by validation scripts. Original ACT/DLL and FFmpeg are not bundled.
