@@ -23,3 +23,6 @@ obj/
 
 # Local validation run report
 /VALIDATION.txt
+
+!docs/media/office97-background-smooth.png
+!docs/media/scribble-idle-background.webp

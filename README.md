@@ -101,6 +101,18 @@ PNG frames and WebP files default to transparent backgrounds. MP4 uses a dark ba
 
 You can combine a background image with a color: transparent parts of the image reveal that color. Background settings, image content hashes, and effective scale participate in output completion signatures.
 
+### Example: Scribble with a background image
+
+![Scribble's idle showcase over the smooth Office 97 preview background](docs/media/scribble-idle-background.webp)
+
+Scribble's short idle sample at 2× scale, with an Office-like background.
+
+To export your own copy of Scribble with this background:
+
+```powershell
+.\Build-And-Export-v5.ps1 -Actor 'C:\Actors\scribble.act' -Scale 2 -WebP -BackgroundImage .\docs\media\office97-background-smooth.png -Output .\ScribbleOutput
+```
+
 ## How loops and idle showcases work
 
 **Finite actions** play through to completion.
