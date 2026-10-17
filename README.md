@@ -4,11 +4,11 @@ Export classic Microsoft Actor (`.ACT`) animations as MP4 videos, animated WebP 
 
 Built with AI assistance using OpenAI Codex for implementation, documentation, and validation work.
 
-### Example: Will's idle showcase
+### Example: Will's short idle sample
 
-![Will performing his idle animation repertoire](docs/media/will-idle.webp)
+![Will performing a short idle animation](docs/media/will-idle.webp)
 
-A transparent animated WebP exported at 2× scale. The showcase includes the reachable idle branches, rather than just a short random sample. This example contains original character artwork; the repository's code license does not apply to it.
+A transparent animated WebP exported at 2× scale. This is the short idle sample; the full idle showcase is available when you export an actor. This example contains original character artwork; the repository's code license does not apply to it.
 
 ## Requirements
 
@@ -103,7 +103,7 @@ You can combine a background image with a color: transparent parts of the image 
 
 ### Example: Scribble with a background image
 
-![Scribble's idle showcase over the smooth Office 97 preview background](docs/media/scribble-idle-background.webp)
+![Scribble's short idle sample over the smooth Office 97 preview background](docs/media/scribble-idle-background.webp)
 
 Scribble's short idle sample at 2× scale, with an Office-like background.
 
